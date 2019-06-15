@@ -7,6 +7,9 @@ var map = new mapboxgl.Map({
   zoom: 0
 });
 
+// https://docs.mapbox.com/mapbox-gl-js/example/hover-styles/
+var hoveredStateId = null; // TODO: rename?
+
 map.on("load", async function() {
   map.addSource("hnm", {
     type: "geojson",
@@ -224,10 +227,38 @@ function addBangladesh() {
     id: "basins-lines",
     type: "fill",
     //interactive: true,
-    source: "basins",
+    source: "bangladesh_basins",
     'paint': {
       'fill-color': '#04F',
-      'fill-opacity': 0.2
+      "fill-opacity": ["case",
+        ["boolean", ["feature-state", "hover"], false],
+        1,
+        0.2
+      ]
     }
+  });
+
+  // When the user moves their mouse over the state-fill layer, we'll update the
+  // feature state for the feature under the mouse.
+  map.on("mousemove", "basins-lines", function(e) {  
+    if (e.features.length > 0) {
+      if (hoveredStateId) {
+        map.setFeatureState({source: 'bangladesh_basins', id: hoveredStateId}, { hover: false });
+      }
+
+      hoveredStateId = e.features[0].id;
+      console.log(hoveredStateId)
+      map.setFeatureState({source: 'bangladesh_basins', id: hoveredStateId}, { hover: true });
+    }
+  });
+    
+  // When the mouse leaves the state-fill layer, update the feature state of the
+  // previously hovered feature.
+  map.on("mouseleave", "basins-lines", function() {
+    if (hoveredStateId) {
+      map.setFeatureState({source: 'bangladesh_basins', id: hoveredStateId}, { hover: false });
+    }
+
+    hoveredStateId =  null;
   });
 }
