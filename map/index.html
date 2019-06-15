@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Create and style clusters</title>
+    <title>DataCats Map</title>
     <meta
       name="viewport"
       content="initial-scale=1,maximum-scale=1,user-scalable=no"
@@ -18,6 +18,40 @@
   <body>
     <div id="map"></div>
 
+    <div class="map-overlay top">
+      <div class="map-overlay-inner">
+        <fieldset>
+          <label>Select layer</label>
+          <select id="layer" name="layer">
+            <option value="water">Water</option>
+            <option value="building">Buildings</option>
+          </select>
+        </fieldset>
+        <fieldset>
+          <label>Source</label>
+          <label for="heatmap">
+            Heatmap:
+            <input type="checkbox" name="heatmap" id="heatmap" />
+          </label>
+          <label for="heatmap">
+            C&A:
+            <input type="checkbox" name="cna" id="cna" />
+          </label>
+          <label for="heatmap">
+            H&M:
+            <input type="checkbox" name="hnm" id="hnm" />
+          </label>
+        </fieldset>
+      </div>
+    </div>
+
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.3.0/mapbox-gl-geocoder.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.3.0/mapbox-gl-geocoder.css"
+      type="text/css"
+    />
     <script src="/base.js"></script>
+    <script src="/controls.js"></script>
   </body>
 </html>

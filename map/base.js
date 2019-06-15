@@ -3,8 +3,8 @@ mapboxgl.accessToken =
 var map = new mapboxgl.Map({
   container: "map",
   style: "mapbox://styles/mapbox/dark-v10",
-  center: [-103.59179687498357, 40.66995747013945],
-  zoom: 3
+  center: [0, 0],
+  zoom: 0
 });
 
 map.on("load", async function() {
@@ -23,16 +23,75 @@ map.on("load", async function() {
     data: "/open_apparrel.geo.json"
   });
 
-  map.addLayer({
-    id: "open_apparrel-point",
-    type: "circle",
-    interactive: true,
-    source: "open_apparrel",
-    paint: {
-      "circle-color": "#00f",
-      "circle-radius": 4
-    }
-  });
+  // map.addLayer({
+  //   id: "open_apparrel-point",
+  //   type: "circle",
+  //   interactive: true,
+  //   source: "open_apparrel",
+  //   paint: {
+  //     "circle-color": "#f1f075",
+  //     "circle-radius": 4
+  //   }
+  // });
+
+  map.addLayer(
+    {
+      id: "open_apparrel-heat",
+      type: "heatmap",
+      source: "open_apparrel",
+      maxzoom: 9,
+      paint: {
+        // Increase the heatmap weight based on frequency and property magnitude
+        "heatmap-weight": [
+          "interpolate",
+          ["linear"],
+          ["get", "mag"],
+          0,
+          0,
+          6,
+          1
+        ],
+        // Increase the heatmap color weight weight by zoom level
+        // heatmap-intensity is a multiplier on top of heatmap-weight
+        "heatmap-intensity": ["interpolate", ["linear"], ["zoom"], 0, 1, 9, 3],
+        // Color ramp for heatmap.  Domain is 0 (low) to 1 (high).
+        // Begin color ramp at 0-stop with a 0-transparancy color
+        // to create a blur-like effect.
+        "heatmap-color": [
+          "interpolate",
+          ["linear"],
+          ["heatmap-density"],
+          0,
+          "rgba(7,70,147,0)",
+          0.2,
+          "rgba(255,255,255,0.4)",
+          0.4,
+          "rgba(255,255,255,0.5)",
+          0.6,
+          "rgba(255,255,255,0.6)",
+          0.8,
+          "rgba(255,255,255,0.7)",
+          1,
+          "rgba(255,255,255,0.9)"
+        ],
+        // Adjust the heatmap radius by zoom level
+        "heatmap-radius": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          // zoom is 5 (or less)
+          4,
+          10,
+          // zoom is 10 (or greater)
+          10,
+          0
+        ],
+        // Transition from heatmap to circle layer by zoom level
+        "heatmap-opacity": ["interpolate", ["linear"], ["zoom"], 7, 0.8, 9, 0]
+      }
+    },
+    "waterway-label"
+  );
 
   map.addLayer({
     id: "hnm-point",
@@ -41,7 +100,17 @@ map.on("load", async function() {
     source: "hnm",
     paint: {
       "circle-color": "#f00",
-      "circle-radius": 4
+      "circle-radius": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        // zoom is 5 (or less) -> circle radius will be 2px
+        4,
+        2,
+        // zoom is 10 (or greater) -> circle radius will be 5px
+        10,
+        5
+      ]
     }
   });
 
@@ -83,10 +152,12 @@ map.on("load", async function() {
       .setLngLat(feature.geometry.coordinates)
       .addTo(map);
   });
-  // map.on("mouseenter", "clusters", function() {
-  //   map.getCanvas().style.cursor = "pointer";
-  // });
-  // map.on("mouseleave", "clusters", function() {
-  //   map.getCanvas().style.cursor = "";
-  // });
+
+  map.addControl(
+    new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl
+    })
+  );
+  map.addControl(new mapboxgl.NavigationControl());
 });
