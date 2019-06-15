@@ -21,7 +21,13 @@ body {
   font: 10px sans-serif;
 }
 
-.stations circle {
+.stations .marker circle {
+  fill: green;
+  stroke: black;
+  stroke-width: 1.5px;
+}
+
+.stations .marker[data-type="FACTORY"] circle {
   fill: brown;
   stroke: black;
   stroke-width: 1.5px;
