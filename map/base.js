@@ -23,17 +23,36 @@ map.on("load", async function() {
     data: "/open_apparrel.geo.json"
   });
 
-  // map.addLayer({
-  //   id: "open_apparrel-point",
-  //   type: "circle",
-  //   interactive: true,
-  //   source: "open_apparrel",
-  //   paint: {
-  //     "circle-color": "#f1f075",
-  //     "circle-radius": 4
-  //   }
-  // });
+  /**
+   * Controlls
+   */
 
+  map.addControl(
+    new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl
+    })
+  );
+  map.addControl(new mapboxgl.NavigationControl());
+
+  //api.mapbox.com/geocoding/v5/mapbox.places/"+country+".json?country="+countrycode+"&access_token="+mapboxgl.accessToken
+
+  addHeatmap();
+  document.querySelector("#heatmap").addEventListener("change", evt => {
+    if (evt.target.checked) return addHeatmap();
+    map.removeLayer("open_apparrel-heat");
+  });
+  document.querySelector("#cna").addEventListener("change", evt => {
+    if (evt.target.checked) return addCna();
+    map.removeLayer("cna-point");
+  });
+  document.querySelector("#hnm").addEventListener("change", evt => {
+    if (evt.target.checked) return addHnm();
+    map.removeLayer("hnm-point");
+  });
+});
+
+function addHeatmap() {
   map.addLayer(
     {
       id: "open_apparrel-heat",
@@ -92,7 +111,9 @@ map.on("load", async function() {
     },
     "waterway-label"
   );
+}
 
+function addHnm() {
   map.addLayer({
     id: "hnm-point",
     type: "circle",
@@ -106,24 +127,11 @@ map.on("load", async function() {
         ["zoom"],
         // zoom is 5 (or less) -> circle radius will be 2px
         4,
-        2,
+        3,
         // zoom is 10 (or greater) -> circle radius will be 5px
         10,
         5
       ]
-    }
-  });
-
-  // #51bbd6 #f1f075 #f28cb1
-
-  map.addLayer({
-    id: "cna-point",
-    type: "circle",
-    interactive: true,
-    source: "cna",
-    paint: {
-      "circle-color": "#0f0",
-      "circle-radius": 4
     }
   });
 
@@ -152,12 +160,52 @@ map.on("load", async function() {
       .setLngLat(feature.geometry.coordinates)
       .addTo(map);
   });
+}
 
-  map.addControl(
-    new MapboxGeocoder({
-      accessToken: mapboxgl.accessToken,
-      mapboxgl: mapboxgl
-    })
-  );
-  map.addControl(new mapboxgl.NavigationControl());
-});
+function addCna() {
+  map.addLayer({
+    id: "cna-point",
+    type: "circle",
+    interactive: true,
+    source: "cna",
+    paint: {
+      "circle-color": "#0f0",
+      "circle-radius": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        // zoom is 5 (or less) -> circle radius will be 2px
+        4,
+        3,
+        // zoom is 10 (or greater) -> circle radius will be 5px
+        10,
+        5
+      ]
+    }
+  });
+
+  map.on("click", "cna-point", function(e) {
+    var features = map.queryRenderedFeatures(e.point, {
+      layers: ["cna-point"] // replace this with the name of the layer
+    });
+    if (!features.length) {
+      return;
+    }
+    var feature = features[0];
+    const lat = feature.geometry.coordinates[0];
+    const lon = feature.geometry.coordinates[1];
+
+    var popup = new mapboxgl.Popup({ offset: [0, -15] })
+      .setLngLat(feature.geometry.coordinates)
+      .setHTML(
+        `
+        <h3>${feature.properties.name}</h3>
+        <a href="https://earthengine.google.com/timelapse#v=${lon},${lat},12,latLng&t=1.09&ps=50&bt=19840101&et=20181231&startDwell=0&endDwell=0">
+          <img src="http://maps.googleapis.com/maps/api/staticmap?center=${lon},${lat}&zoom=17&maptype=satellite&size=220x200&key=AIzaSyBaBF2STO8Irsa0lM0xYfrWgORFGFNt8z0"
+        </a>
+        `
+      )
+      .setLngLat(feature.geometry.coordinates)
+      .addTo(map);
+  });
+}
