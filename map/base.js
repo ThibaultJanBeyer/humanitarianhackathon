@@ -23,6 +23,11 @@ map.on("load", async function() {
     data: "/open_apparrel.geo.json"
   });
 
+  map.addSource("bangladesh_basins", {
+    type: "geojson",
+    data: "/bangladesh_basins.geo.json"
+  }); 
+
   /**
    * Controlls
    */
@@ -50,6 +55,10 @@ map.on("load", async function() {
     if (evt.target.checked) return addHnm();
     map.removeLayer("hnm-point");
   });
+  document.querySelector("#bangladesh").addEventListener("change", evt => {
+    if (evt.target.checked) return addBangladesh();
+    map.removeLayer("basins-lines");
+  });  
 });
 
 function addHeatmap() {
@@ -207,5 +216,18 @@ function addCna() {
       )
       .setLngLat(feature.geometry.coordinates)
       .addTo(map);
+  });
+}  
+
+function addBangladesh() {
+  map.addLayer({
+    id: "basins-lines",
+    type: "fill",
+    //interactive: true,
+    source: "basins",
+    'paint': {
+      'fill-color': '#04F',
+      'fill-opacity': 0.2
+    }
   });
 }
