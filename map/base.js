@@ -1,86 +1,92 @@
-let map;
+mapboxgl.accessToken =
+  "pk.eyJ1IjoidGhpYmF1bHRqYW5iZXllciIsImEiOiJjand4cTRrcXEyM2l5NGJwNXFzYnY2dW5yIn0.cKm9QnyKCuUdg2BerGO_4Q";
+var map = new mapboxgl.Map({
+  container: "map",
+  style: "mapbox://styles/mapbox/dark-v10",
+  center: [-103.59179687498357, 40.66995747013945],
+  zoom: 3
+});
 
-function initMap() {
-  // Create the Google Map…
-  map = new google.maps.Map(d3.select("#map").node(), {
-    zoom: 2,
-    center: new google.maps.LatLng(0, 0),
-    mapTypeId: google.maps.MapTypeId.TERRAIN
+map.on("load", async function() {
+  map.addSource("hnm", {
+    type: "geojson",
+    data: "/h_n_m.geo.json"
   });
 
-  // Load the station data. When the data comes back, create an overlay.
-  d3.json("c_n_a_locations.json", (error, data) =>
-    handleData(error, data, "H&M")
-  );
-  d3.json("h_n_m_locations.json", (error, data) =>
-    handleData(error, data, "C&A")
-  );
-}
+  map.addSource("cna", {
+    type: "geojson",
+    data: "/c_n_a.geo.json"
+  });
 
-function handleData(error, data, source) {
-  if (error) throw error;
+  map.addSource("open_apparrel", {
+    type: "geojson",
+    data: "/open_apparrel.geo.json"
+  });
 
-  var overlay = new google.maps.OverlayView();
+  map.addLayer({
+    id: "open_apparrel-point",
+    type: "circle",
+    interactive: true,
+    source: "open_apparrel",
+    paint: {
+      "circle-color": "#00f",
+      "circle-radius": 4
+    }
+  });
 
-  // Add the container when the overlay is added to the map.
-  overlay.onAdd = function() {
-    var layer = d3
-      .select(this.getPanes().overlayLayer)
-      .append("div")
-      .attr("class", "stations");
+  map.addLayer({
+    id: "hnm-point",
+    type: "circle",
+    interactive: true,
+    source: "hnm",
+    paint: {
+      "circle-color": "#f00",
+      "circle-radius": 4
+    }
+  });
 
-    // Draw each marker as a separate SVG element.
-    // We could use a single SVG, but what size would it have?
-    overlay.draw = function() {
-      var projection = this.getProjection(),
-        padding = 10;
+  // #51bbd6 #f1f075 #f28cb1
 
-      var marker = layer
-        .selectAll("svg")
-        .data(d3.entries(data))
-        .each(transform) // update existing markers
-        .enter()
-        .append("svg")
-        .each(transform)
-        .attr("class", "marker");
+  map.addLayer({
+    id: "cna-point",
+    type: "circle",
+    interactive: true,
+    source: "cna",
+    paint: {
+      "circle-color": "#0f0",
+      "circle-radius": 4
+    }
+  });
 
-      // Add a circle.
-      marker
-        .append("circle")
-        .attr("r", 4.5)
-        .attr("style", source === "H&M" ? "fill: blue" : "fill: orange")
-        .attr("cx", padding)
-        .attr("cy", padding)
-        .each(function(e) {
-          this.addEventListener("click", e => console.log("WOWOOWOWOW"));
-          d3.select(this)
-            .on("click", function(e) {
-              this.append("text")
-                .attr("x", padding + 7)
-                .attr("y", padding)
-                .attr("dy", ".31em")
-                .text(d => d.value.name);
-            })
-            .on("mouseout", function(e) {
-              d3.select("#t" + d.x + "-" + d.y + "-" + i).remove(); // Remove text location
-            });
-        });
+  map.on("click", "hnm-point", function(e) {
+    console.log(e);
+    var features = map.queryRenderedFeatures(e.point, {
+      layers: ["hnm-point"] // replace this with the name of the layer
+    });
+    if (!features.length) {
+      return;
+    }
+    var feature = features[0];
+    const lat = feature.geometry.coordinates[0];
+    const lon = feature.geometry.coordinates[1];
 
-      function transform(d) {
-        const bak = d;
-        d = new google.maps.LatLng(d.value.lat, d.value.lon);
-        d = projection.fromLatLngToDivPixel(d);
-        return d3
-          .select(this)
-          .attr("data-supplier", bak.value.supplier)
-          .attr("data-address", bak.value["address_string"])
-          .attr("data-type", bak.value["company_type"])
-          .style("left", d.x - padding + "px")
-          .style("top", d.y - padding + "px");
-      }
-    };
-  };
-
-  // Bind our overlay to the map…
-  overlay.setMap(map);
-}
+    var popup = new mapboxgl.Popup({ offset: [0, -15] })
+      .setLngLat(feature.geometry.coordinates)
+      .setHTML(
+        `
+        <h3>${feature.properties.name}</h3>
+        <a href="https://earthengine.google.com/timelapse#v=${lon},${lat},12,latLng&t=1.09&ps=50&bt=19840101&et=20181231&startDwell=0&endDwell=0">
+          <img src="http://maps.googleapis.com/maps/api/staticmap?center=${lon},${lat}&zoom=17&maptype=satellite&size=220x200&key=AIzaSyBaBF2STO8Irsa0lM0xYfrWgORFGFNt8z0"
+        </a>
+        `
+      )
+      .setLngLat(feature.geometry.coordinates)
+      .addTo(map);
+  });
+  // map.on("mouseenter", "clusters", function() {
+  //   map.getCanvas().style.cursor = "pointer";
+  // });
+  // map.on("mouseleave", "clusters", function() {
+  //   map.getCanvas().style.cursor = "";
+  // });
+});

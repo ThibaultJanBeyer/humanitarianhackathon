@@ -1,34 +1,18 @@
-html,
 body {
-  height: 100%;
   margin: 0;
   padding: 0;
 }
 
 #map {
-  height: 100%;
-}
-
-.stations,
-.stations svg {
   position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
 }
 
-.stations svg {
-  width: 60px;
-  height: 20px;
-  padding-right: 100px;
-  font: 10px sans-serif;
-}
-
-.stations .marker circle {
-  fill: green;
-  stroke: black;
-  stroke-width: 1.5px;
-}
-
-.stations .marker[data-type="FACTORY"] circle {
-  fill: brown;
-  stroke: black;
-  stroke-width: 1.5px;
+.marker {
+  width: 10px;
+  height: 10px;
+  background: red;
+  border-radius: 50%;
 }
