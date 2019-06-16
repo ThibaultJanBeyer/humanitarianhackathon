@@ -10,7 +10,7 @@ DataCats 2019
 
 - Find the map code in the `/docs` folder.
 - Find the web-scraping code in the `/datagathering` folder
-- Find all extra infos in the `meta` folder.
+- Find all extra infos in the `/meta` folder.
   - Like our [Presentation](meta/DataCatsPitch.pdf)
   - Like the [Hackathon Opening PDF](meta/opening.pdf)
   - Like the [WWF Presentation](meta/WWF_Berlin_Hackathon_140619.pdf) of the Hackathon Challenges
