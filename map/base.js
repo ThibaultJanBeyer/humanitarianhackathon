@@ -1,6 +1,8 @@
 mapboxgl.accessToken =
   "pk.eyJ1IjoidGhpYmF1bHRqYW5iZXllciIsImEiOiJjand4cTRrcXEyM2l5NGJwNXFzYnY2dW5yIn0.cKm9QnyKCuUdg2BerGO_4Q";
-var map = new mapboxgl.Map({
+
+let hnmFeatures, cnaFeatures, allFeatures;
+const map = new mapboxgl.Map({
   container: "map",
   style: "mapbox://styles/mapbox/dark-v10",
   center: [0, 0],
@@ -29,18 +31,17 @@ map.on("load", async function() {
   map.addSource("bangladesh_basins", {
     type: "geojson",
     data: "/bangladesh_basins.geo.json"
-  }); 
+  });
 
   /**
    * Controlls
    */
 
-  map.addControl(
-    new MapboxGeocoder({
-      accessToken: mapboxgl.accessToken,
-      mapboxgl: mapboxgl
-    })
-  );
+  const Geocoder = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl
+  });
+  map.addControl(Geocoder);
   map.addControl(new mapboxgl.NavigationControl());
 
   //api.mapbox.com/geocoding/v5/mapbox.places/"+country+".json?country="+countrycode+"&access_token="+mapboxgl.accessToken
@@ -50,10 +51,12 @@ map.on("load", async function() {
     if (evt.target.checked) return addHeatmap();
     map.removeLayer("open_apparrel-heat");
   });
+  addCna();
   document.querySelector("#cna").addEventListener("change", evt => {
     if (evt.target.checked) return addCna();
     map.removeLayer("cna-point");
   });
+  addHnm();
   document.querySelector("#hnm").addEventListener("change", evt => {
     if (evt.target.checked) return addHnm();
     map.removeLayer("hnm-point");
@@ -61,8 +64,66 @@ map.on("load", async function() {
   document.querySelector("#bangladesh").addEventListener("change", evt => {
     if (evt.target.checked) return addBangladesh();
     map.removeLayer("basins-lines");
-  });  
+  });
+
+  Geocoder.on("result", function(data) {
+    const bbox = data.result.bbox;
+
+    const el1 = document.createElement("div");
+    new mapboxgl.Marker(el1).setLngLat([bbox[0], bbox[1]]).addTo(map);
+    const el2 = document.createElement("div");
+    new mapboxgl.Marker(el2).setLngLat([bbox[2], bbox[3]]).addTo(map);
+
+    const canvas = map.getCanvasContainer();
+    const rect = canvas.getBoundingClientRect();
+    const el1R = el1.getBoundingClientRect();
+    const cEl1 = new mapboxgl.Point(
+      el1R.left - rect.left - canvas.clientLeft,
+      el1R.top - rect.top - canvas.clientTop
+    );
+    const el2R = el2.getBoundingClientRect();
+    const cEl2 = new mapboxgl.Point(
+      el2R.left - rect.left - canvas.clientLeft,
+      el2R.top - rect.top - canvas.clientTop
+    );
+
+    try {
+      hnmFeatures = map.queryRenderedFeatures([cEl1, cEl2], {
+        layers: ["hnm-point"]
+      });
+    } catch (e) {
+      console.log(e);
+    }
+
+    try {
+      cnaFeatures = map.queryRenderedFeatures([cEl1, cEl2], {
+        layers: ["cna-point"]
+      });
+    } catch (e) {
+      console.log(e);
+    }
+
+    try {
+      allFeatures = map.queryRenderedFeatures([cEl1, cEl2], {
+        layers: ["open_apparrel-heat"]
+      });
+    } catch (e) {
+      console.log(e);
+    }
+
+    console.log("f2", hnmFeatures, cnaFeatures, allFeatures);
+    refreshFeatures();
+  });
 });
+
+function refreshFeatures() {
+  const hnm = (hnmFeatures && hnmFeatures.length) || 0;
+  const cna = (cnaFeatures && cnaFeatures.length) || 0;
+  const all = (allFeatures && allFeatures.length) || 0;
+  document.querySelector("#features").innerHTML = hnm + cna + all || "";
+  document.querySelector("#hnmFeatures").innerHTML = hnm || "";
+  document.querySelector("#cnaFeatures").innerHTML = cna || "";
+}
 
 function addHeatmap() {
   map.addLayer(
@@ -123,6 +184,17 @@ function addHeatmap() {
     },
     "waterway-label"
   );
+
+  setTimeout(() => {
+    try {
+      hnmFeatures = map.queryRenderedFeatures(null, {
+        layers: ["open_apparrel-heat"]
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    refreshFeatures();
+  }, 5000);
 }
 
 function addHnm() {
@@ -172,6 +244,17 @@ function addHnm() {
       .setLngLat(feature.geometry.coordinates)
       .addTo(map);
   });
+
+  setTimeout(() => {
+    try {
+      hnmFeatures = map.queryRenderedFeatures(null, {
+        layers: ["hnm-point"]
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    refreshFeatures();
+  }, 5000);
 }
 
 function addCna() {
@@ -220,7 +303,18 @@ function addCna() {
       .setLngLat(feature.geometry.coordinates)
       .addTo(map);
   });
-}  
+
+  setTimeout(() => {
+    try {
+      cnaFeatures = map.queryRenderedFeatures(null, {
+        layers: ["cna-point"]
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    refreshFeatures();
+  }, 5000);
+}
 
 function addBangladesh() {
   map.addLayer({
@@ -228,9 +322,10 @@ function addBangladesh() {
     type: "fill",
     //interactive: true,
     source: "bangladesh_basins",
-    'paint': {
-      'fill-color': '#04F',
-      "fill-opacity": ["case",
+    paint: {
+      "fill-color": "#04F",
+      "fill-opacity": [
+        "case",
         ["boolean", ["feature-state", "hover"], false],
         0.6,
         0.2
@@ -240,25 +335,34 @@ function addBangladesh() {
 
   // When the user moves their mouse over the state-fill layer, we'll update the
   // feature state for the feature under the mouse.
-  map.on("mousemove", "basins-lines", function(e) {  
+  map.on("mousemove", "basins-lines", function(e) {
     if (e.features.length > 0) {
       if (hoveredStateId) {
-        map.setFeatureState({source: 'bangladesh_basins', id: hoveredStateId}, { hover: false });
+        map.setFeatureState(
+          { source: "bangladesh_basins", id: hoveredStateId },
+          { hover: false }
+        );
       }
 
       hoveredStateId = e.features[0].id;
-      console.log(hoveredStateId)
-      map.setFeatureState({source: 'bangladesh_basins', id: hoveredStateId}, { hover: true });
+      console.log(hoveredStateId);
+      map.setFeatureState(
+        { source: "bangladesh_basins", id: hoveredStateId },
+        { hover: true }
+      );
     }
   });
-    
+
   // When the mouse leaves the state-fill layer, update the feature state of the
   // previously hovered feature.
   map.on("mouseleave", "basins-lines", function() {
     if (hoveredStateId) {
-      map.setFeatureState({source: 'bangladesh_basins', id: hoveredStateId}, { hover: false });
+      map.setFeatureState(
+        { source: "bangladesh_basins", id: hoveredStateId },
+        { hover: false }
+      );
     }
 
-    hoveredStateId =  null;
+    hoveredStateId = null;
   });
 }
