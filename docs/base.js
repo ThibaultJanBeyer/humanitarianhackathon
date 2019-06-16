@@ -1,5 +1,5 @@
 mapboxgl.accessToken =
-  "pk.eyJ1IjoidGhpYmF1bHRqYW5iZXllciIsImEiOiJjand4cTRrcXEyM2l5NGJwNXFzYnY2dW5yIn0.cKm9QnyKCuUdg2BerGO_4Q";
+  "pk.eyJ1IjoidGhpYmF1bHRqYW5iZXllciIsImEiOiJjand4cTZjZm0wajllNDBwbWN2a3E0MWd2In0.WK5_VizBp-e8jmdF6CLXUA";
 googleKey = "AIzaSyBaBF2STO8Irsa0lM0xYfrWgORFGFNt8z0";
 
 // Note: those keys ^ are bound to the github page and will only work when running via the github page. If you want to run it locally or somewhere else, you’ll need to generate your own keys
