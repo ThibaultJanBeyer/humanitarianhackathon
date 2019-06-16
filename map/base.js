@@ -232,7 +232,7 @@ function addBangladesh() {
       'fill-color': '#04F',
       "fill-opacity": ["case",
         ["boolean", ["feature-state", "hover"], false],
-        1,
+        0.6,
         0.2
       ]
     }
