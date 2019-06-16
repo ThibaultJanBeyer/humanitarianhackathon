@@ -1,5 +1,8 @@
 mapboxgl.accessToken =
   "pk.eyJ1IjoidGhpYmF1bHRqYW5iZXllciIsImEiOiJjand4cTRrcXEyM2l5NGJwNXFzYnY2dW5yIn0.cKm9QnyKCuUdg2BerGO_4Q";
+googleKey = "AIzaSyBaBF2STO8Irsa0lM0xYfrWgORFGFNt8z0";
+
+// Note: those keys ^ are bound to the github page and will only work when running via the github page. If you want to run it locally or somewhere else, you’ll need to generate your own keys
 
 let hnmFeatures, cnaFeatures, allFeatures;
 const map = new mapboxgl.Map({
@@ -237,7 +240,7 @@ function addHnm() {
         `
         <h3>${feature.properties.name}</h3>
         <a href="https://earthengine.google.com/timelapse#v=${lon},${lat},12,latLng&t=1.09&ps=50&bt=19840101&et=20181231&startDwell=0&endDwell=0">
-          <img src="http://maps.googleapis.com/maps/api/staticmap?center=${lon},${lat}&zoom=17&maptype=satellite&size=220x200&key=AIzaSyBaBF2STO8Irsa0lM0xYfrWgORFGFNt8z0"
+          <img src="http://maps.googleapis.com/maps/api/staticmap?center=${lon},${lat}&zoom=17&maptype=satellite&size=220x200&key=${googleKey}"
         </a>
         `
       )
