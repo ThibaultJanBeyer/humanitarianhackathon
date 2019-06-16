@@ -1,6 +1,6 @@
-# humanitarianhackathon
+# Facebooks Developer Circle Humanitarian Hackathon
 
-DataCats 2019
+Teamn DataCats 2019
 
 - **We actually won the hackathon**
 - Done in ~24h from concept to app to presentation
