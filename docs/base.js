@@ -18,22 +18,22 @@ var hoveredStateId = null; // TODO: rename?
 map.on("load", async function() {
   map.addSource("hnm", {
     type: "geojson",
-    data: "/h_n_m.geo.json"
+    data: "h_n_m.geo.json"
   });
 
   map.addSource("cna", {
     type: "geojson",
-    data: "/c_n_a.geo.json"
+    data: "c_n_a.geo.json"
   });
 
   map.addSource("open_apparrel", {
     type: "geojson",
-    data: "/open_apparrel.geo.json"
+    data: "open_apparrel.geo.json"
   });
 
   map.addSource("bangladesh_basins", {
     type: "geojson",
-    data: "/bangladesh_basins.geo.json"
+    data: "bangladesh_basins.geo.json"
   });
 
   /**
