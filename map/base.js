@@ -164,7 +164,7 @@ function addHeatmap() {
           0.8,
           "rgba(255,255,255,0.7)",
           1,
-          "rgba(255,255,255,0.9)"
+          "rgba(255,255,255,0.8)"
         ],
         // Adjust the heatmap radius by zoom level
         "heatmap-radius": [
@@ -204,7 +204,7 @@ function addHnm() {
     interactive: true,
     source: "hnm",
     paint: {
-      "circle-color": "#f00",
+      "circle-color": "#DC143C",
       "circle-radius": [
         "interpolate",
         ["linear"],
@@ -264,7 +264,7 @@ function addCna() {
     interactive: true,
     source: "cna",
     paint: {
-      "circle-color": "#0f0",
+      "circle-color": "#98fb98",
       "circle-radius": [
         "interpolate",
         ["linear"],
