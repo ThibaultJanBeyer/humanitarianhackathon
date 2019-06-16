@@ -9,13 +9,12 @@ body {
   bottom: 0;
   width: 100%;
 }
-
+/* 
 .marker {
   width: 10px;
   height: 10px;
-  background: red;
-  border-radius: 50%;
-}
+  background: pink;
+} */
 
 .map-overlay {
   font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
