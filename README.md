@@ -6,8 +6,6 @@ Teamn DataCats 2019
 - Done in ~24h from concept to app to presentation
 - More info on the hackathon can be found here: https://humanitarian-hackathon-w-wwf.devpost.com/ (probably see all submissions??)
 
-# Test it by running a static file server inside `/docs`
-
 - Find the map code in the `/docs` folder.
 - Find the web-scraping code in the `/datagathering` folder
 - Find all extra infos in the `/meta` folder.
@@ -17,4 +15,7 @@ Teamn DataCats 2019
   - Like a [Résumé of the Presentations](meta/Humanitarian-Hackathon-Resume.pdf)
   - Like our [Research Pastebin](meta/[DataCats]InformationDocument.pdf)
 
-code is hacky di hack rubberband ducktaping hack
+# Try it:
+- By opening: https://thibaultjanbeyer.github.io/humanitarianhackathon/
+- Or test it locally by running a static file server inside `/docs`
+- code is hacky di hack rubberband ducktaping hack
