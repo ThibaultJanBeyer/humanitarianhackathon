@@ -17,8 +17,8 @@ Teamn DataCats 2019
   - Like a [Résumé of the Presentations](meta/Humanitarian-Hackathon-Resume.pdf)
   - Like our [Research Pastebin](meta/[DataCats]InformationDocument.pdf)
   
-(Private Drive: https://drive.google.com/drive/folders/15EHVnDUJPzezKSVu7DRf3MiNqqAerNp7)
-(Payd solution: https://www.chainpoint.com/solutions/tracemap/)
+(Private Drive: https://drive.google.com/drive/folders/15EHVnDUJPzezKSVu7DRf3MiNqqAerNp7)  
+(Paid solution: https://www.chainpoint.com/solutions/tracemap/)
 
 # Try it:
 - By opening: https://thibaultjanbeyer.github.io/humanitarianhackathon/
